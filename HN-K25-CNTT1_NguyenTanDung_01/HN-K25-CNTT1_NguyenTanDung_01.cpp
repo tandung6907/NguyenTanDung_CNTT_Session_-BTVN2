@@ -60,17 +60,7 @@ int main () {
 					printf("Vui long nhap so phan tu va gia tri phan tu truoc!!\n");
 					break;
 				}
-				printf("Cac so nguyen to trong mang la: ");
-            	int found = 0;
-    			for (i=0 ; i<num ; i++) {
-        			if (isPrime(arr[i])) {
-            			printf("%d ", arr[i]);
-            			found = 1;
-        		}
-    		}
-    				if (!found)
-        				printf("Khong co so nguyen to nao trong mang!");
-				printf("\n");
+			
 				break;	
 			case 4:
 				if (num==0) {
