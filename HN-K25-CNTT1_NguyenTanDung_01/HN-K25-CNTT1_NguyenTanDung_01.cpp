@@ -1,16 +1,7 @@
 #include<stdio.h>
 #define MAX 100
 #include<math.h>
-int isPrime(int num) {
-	int i;
-    if (num < 2)
-        return 0;
-    for ( i = 2; i <= sqrt(num); i++) {
-        if (num % i == 0)
-            return 0; 
-    }
-    return 1;
-}
+
 int main () {
 	int num, i, j, choice, index, value, searchvalue;
 	int arr[MAX];
