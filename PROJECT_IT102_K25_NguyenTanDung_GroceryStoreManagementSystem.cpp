@@ -146,10 +146,10 @@ void printHeaderList() {
     printf("-------------------------------------------------------------------------\n");
 	
 }
-// Hàm kiểm tra xem chuỗi có chứa ký tự khoảng trắng (' ') hay không
+// Hàm kiểm tra xem chuỗi có chứa ký tự khoảng trắng (' ') hoặc \t ('	') hay không
 bool containsSpace(const char *str) {
     for (int i = 0; str[i] != '\0'; i++) {
-        if (str[i] == ' ') {
+        if (str[i] == ' ' || str[i] == '\t) {
             return true;
         }
     }
@@ -730,3 +730,4 @@ int main () {
 	
 	return 0;
 }
+
