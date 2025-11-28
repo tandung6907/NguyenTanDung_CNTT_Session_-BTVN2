@@ -1,6 +1,7 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h> 
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h> 
+#include<stdbool.h>
 //Gán giá trị cho số lượng hàng hóa + hàng giao dịch
 #define MAX_PRODUCTS 100
 #define MAX_TRANSACTIONS 500
@@ -10,7 +11,7 @@
 //Số phần tử trong 1 trang
 #define ITEMS_PER_PAGE 5
 //Cho số hàng hóa ban đầu = 0
-int productCount = 5;
+int productCount = 10;
 int transactionCount = 0;
 
 typedef struct {
@@ -33,12 +34,48 @@ typedef struct {
 //Khai báo mảng cấu trúc
 Transaction transactions[MAX_TRANSACTIONS];
 Product products[MAX_PRODUCTS] = {
-	{"001","IP11 PRO MAX", "Chiec", 68, 1},
-	{"002","IP12 PRO MAX", "Chiec", 69, 1},
-	{"003","IP13 PRO MAX", "Chiec", 17, 1}, 
-	{"004","IP14 PRO MAX", "Chiec", 15, 1},
-	{"005","IP15 PRO MAX", "Chiec", 100, 1}
+
+	{"001","LENOVO LEGION R7000Y", "Chiec", 68, 1},
+	{"002","C2 OI HONG", "Chai", 69, 1},
+	{"003","DUA HAU", "Kg", 1000, 1}, 
+	{"004","KHUYEN TAI NAM TRON", "Chiec", 2000, 1},
+	{"005","ACER NITRO 5", "Chiec", 100, 1},
+	{"006","REDMI TURBO 4", "Chiec", 100, 1},
+	{"007","CAMEL TRA DEN", "Bao", 100, 1},
+	{"008","IP17 PRO MAX", "Chiec", 100, 1},
+	{"009","THUOC LAO HAT DO", "Goi", 100, 1},
+	{"010","SAMSUNG S25 ULTRA", "Chiec", 100, 1}
+
 };
+//Kiểm tra số nguyên
+int getNumber (const char* suggest, int min, int max) {
+
+	char string[10];
+	do {
+		printf("%s", suggest);
+		fgets(string, sizeof(string), stdin);
+		string[strcspn(string, "\n")] = '\0';
+		if (string[0]=='\0') {
+			printf("Khong duoc de trong thong tin!!\n");
+			continue;
+		} else {
+			int isDigit = 1;
+			int i;
+			for (i=0; i<strlen(string); i++) {
+				if (string[i]<48 || string[i]>57) {
+					isDigit = 0;
+					break;
+				}
+			}
+			if (isDigit==1) {
+				return atoi(string);
+			} else {
+				printf("Vui long nhap thong tin la so nguyen duong!!!\n");
+			}
+		}
+	} while (1);
+
+}
 //In Menu chính
 void displayMenuMain () {
 	
@@ -109,10 +146,18 @@ void printHeaderList() {
     printf("-------------------------------------------------------------------------\n");
 	
 }
+// Hàm kiểm tra xem chuỗi có chứa ký tự khoảng trắng (' ') hay không
+bool containsSpace(const char *str) {
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (str[i] == ' ') {
+            return true;
+        }
+    }
+    return false;
+}
 //F01_Nhập mã sản phẩm
 void enterProductId () {
 //Kiểm tra số phần tử trong danh sách	
-	getchar();
 	if (productCount>=MAX_PRODUCTS) {
 		printf("ERROR: He thong da day. Khong the them san pham moi!!!\n");
 		return;
@@ -121,48 +166,44 @@ void enterProductId () {
 	printf("\n--- THEM MA HANG MOI ---\n");
 	char id[10], name[NAME_LENGTH], unit[UNIT_LENGTH];
     int qty;
-//Nhập thông tin:
-    	do {
+//Nhập thông tin
+    	do {	
 			printf("Nhap Ma Don Hang: ");
 			fgets(id, sizeof(id), stdin);
 			id[strcspn(id, "\n")] = '\0';
-			fflush(stdin);
+			bool hasSpace = containsSpace(id);
 			//ID không rỗng và là duy nhất
         	if (strlen(id) == 0) {
              	printf("ERROR: ID khong duoc rong. Vui long nhap lai.\n");
         	} else if (!isProductIdUnique(id)) {
             	printf("ERROR: Ma hang (ID: %s) da ton tai. Vui long nhap ID khac!!\n", id);
-        	}
-    	} while (strlen(id) == 0 || !isProductIdUnique(id));
-		
+        	} else if (hasSpace) {
+				printf("ERROR: ID khong duoc rong. Vui long nhap lai.\n");
+			}
+    	} while (strlen(id) == 0 || !isProductIdUnique(id) || containsSpace(id));
 		do {
 			printf("Nhap Ten Hang Hoa: ");
 			fgets(name, sizeof(name), stdin);
 			name[strcspn(name, "\n")] = '\0';
-			fflush(stdin);
 			//Tên không rỗng
 			if (strlen(name) == 0) {
              	printf("ERROR: Ten hang hoa khong duoc rong. Nhap lai!!\n");
         	}
 		} while (strlen(name) == 0);
-    		
 		do {
 			printf("Nhap Don Vi Hang Hoa: ");
 			fgets(unit, sizeof(unit), stdin);
 			unit[strcspn(unit, "\n")] = '\0';
-			fflush(stdin);
 			//Đơn vị không rỗng
 			if (strlen(unit) == 0) {
              	printf("ERROR: Don vi hang hoa khong duoc rong. Nhap lai!!\n");
-        	}
-		} while (strlen(unit) == 0);
-		
-		printf("Nhap So Luong Hang Hoa: ");
+        	} else if (containsSpace(unit)) {
+				printf("ERROR: Don vi hang hoa khong duoc rong. Nhap lai!!\n");
+			}
+		} while (strlen(unit) == 0 || containsSpace(unit));
 		//Số lượng phải là số nguyên >0
-		while (scanf("%d", &qty) != 1 || qty < 0) {
-        	printf("ERROR: So luong ton kho phai la so nguyen >= 0. Nhap lai: ");
-        	getchar();
-    	}
+		qty = getNumber("Nhap So Luong: ", 1, 9999);
+
     	//Lưu giá trị vừa nhập vào biến newProduct
     	Product newProduct;
     	strcpy(newProduct.productId, id);
@@ -188,11 +229,10 @@ void updateInformationProduct () {
     int inputResult;
     
     printf("\n--- CAP NHAT THONG TIN HANG HOA ---\n");
-	getchar();
 	printf("Nhap MSP Muon Cap Nhat: ");
 	fgets(id, sizeof(id), stdin);
 	id[strcspn(id, "\n")] = '\0';
-	fflush(stdin);
+
 //Tìm kiếm ID theo hàm kiếm ID	
 	index = findProductIndex(id);
     if (index == -1) {
@@ -200,19 +240,24 @@ void updateInformationProduct () {
         return;
     }
 //Bắt đầu cập nhật sau khi tìm thấy ID 
-    printf("Nhap Ten hang hoa moi (Enter de giu nguyen): ");
+		printf("Nhap Ten hang hoa moi (Enter de giu nguyen): ");
     fgets(newName, sizeof(newName), stdin);
     newName[strcspn(newName, "\n")] = '\0';
-    fflush(stdin);
 	//Sao chép vào mảng cấu trúc
     if (strlen(newName) > 0) {
         strcpy(products[index].name, newName);
     }
-    
-    printf("Nhap Don vi moi (Enter de giu nguyen): ");
-    fgets(newUnit, sizeof(newUnit), stdin);
-    newUnit[strcspn(newUnit, "\n")] = '\0';
-    fflush(stdin);
+
+    do {
+		printf("Nhap Don vi moi (Enter de giu nguyen): ");
+   	 	fgets(newUnit, sizeof(newUnit), stdin);
+    	newUnit[strcspn(newUnit, "\n")] = '\0';
+		if (strlen(newUnit) > 0) {
+			if (containsSpace(newUnit)) {
+				printf("ERROR: Don vi hang hoa khong duoc rong. Nhap lai!!\n");
+			}
+		}
+	} while (strlen(newUnit) > 0 && containsSpace(newUnit));
 	//Sao chép vào mảng cấu trúc
     if (strlen(newUnit) > 0) {
         strcpy(products[index].unit, newUnit);
@@ -221,7 +266,6 @@ void updateInformationProduct () {
     printf("Nhap So luong ton kho moi (Nhap -1 de giu nguyen): ");
     inputResult = scanf("%d", &newQty);
 	getchar();
-	
 	if (inputResult == 1) {
         if (newQty >= 0) {
             products[index].qty = newQty;
@@ -251,13 +295,12 @@ void manageStatusById () {
 	char id[10];
     int status;
     int index;
-    
-    getchar();
+
     printf("\n--- QUAN LY TRANG THAI HANG HOA ---\n");
     printf("Nhap ID hang hoa can thay doi trang thai: ");
     fgets(id, sizeof(id), stdin);
     id[strcspn(id, "\n")] = '\0';
-    fflush(stdin);
+
 
     index = findProductIndex(id);
     if (index == -1) {
@@ -267,12 +310,25 @@ void manageStatusById () {
     
     printf("Trang thai hien tai cua %s: %s\n", id, 
            (products[index].status == 1) ? "1 - Con su dung" : "0 - Het han su dung");
-           
-    printf("Nhap trang thai moi (1: Active, 0: Locked/Soft Delete): ");
-    while (scanf("%d", &status) != 1 || (status != 0 && status != 1)) {
-        printf("ERROR: Chi chap nhan 1 hoac 0. Nhap lai: ");
-        getchar();
-    }
+    char statusStr[10];
+    do {
+        printf("Nhap trang thai moi (1: Active, 0: Locked/Soft Delete): ");
+        if (fgets(statusStr, sizeof(statusStr), stdin) == NULL) {
+            return;
+        }
+        statusStr[strcspn(statusStr, "\n")] = '\0';
+        if (strlen(statusStr) != 1) {
+            printf("ERROR: Vui long nhap dung 1 ky tu (1 hoac 0), khong de trong.\n");
+            continue;
+        }
+        if (statusStr[0] == '0' || statusStr[0] == '1') {
+            status = statusStr[0] - '0';
+            break;
+        } else {
+            printf("ERROR: Chi chap nhan 1 hoac 0. Nhap lai: \n");
+        }
+        
+    } while (1); 
 
     products[index].status = status;
     if (status == 0) {
@@ -293,12 +349,10 @@ void findProductByIdOrName () {
     int foundCount = 0;
     
     printf("\n--- TRA CUU HANG HOA ---\n");
-    getchar();
     printf("Nhap ID (tim chinh xac) hoac Ten (tim gan dung): ");
 	fgets(keyword, sizeof(keyword), stdin);
 	keyword[strcspn(keyword, "\n")] = '\0';
-	fflush(stdin);
-	
+
 	printHeaderList();
 	int i;
     for (i=0; i<productCount; i++) {
@@ -323,6 +377,7 @@ void listPagination () {
 	int currentPage = 1, totalPages;
 	int start, end;
 	char inputPage[10];
+	int targetPage;
 //Phân trang
 	totalPages = (productCount+ITEMS_PER_PAGE-1)/ITEMS_PER_PAGE;
 	do {
@@ -337,9 +392,9 @@ void listPagination () {
             printProduct(&products[i]);
         }
 //Logic để truy cập trang kế tiếp hoặc quay lại hoặc thoát danh sách
-        printf("\n[Trang: %d/%d] Nhap 'c' de tiep theo, 'b' de truoc, 'e' de thoat: ", currentPage, totalPages);
-        scanf("%s", &inputPage);
-        getchar();
+        printf("\n[Trang: %d/%d] Nhap 'c' de tiep theo, 'b' de truoc, 'f' de tim trang, 'e' de thoat: ", currentPage, totalPages);
+        fgets(inputPage, sizeof(inputPage), stdin);
+		inputPage[strcspn(inputPage, "\n")] = '\0';
 
         if (strcmp(inputPage, "c") == 0) {
             if (currentPage < totalPages) {
@@ -353,11 +408,18 @@ void listPagination () {
 			} else {
 				printf("!!! KHONG CO TRANG TRUOC. Ban dang o trang dau (1/%d).\n", totalPages);
 			}
+        } else if (strcmp(inputPage, "f") == 0) {
+            targetPage = getNumber("Nhap trang muon tim: ", 1, 9999);
+			if (targetPage >= 1 && targetPage <= totalPages) {
+                    currentPage = targetPage;
+                } else {
+                    printf("ERROR: So trang khong hop le. Vui long nhap so trong khoang 1 den %d.\n", totalPages);
+                }
         } else if (strcmp(inputPage, "e") == 0) {
             break;
         } else {
-            printf("Lenh khong hop le.\n");
-        }
+			printf("Lenh khong hop le.\n");
+		}
     } while (1);
 	
 }
@@ -382,17 +444,27 @@ void sortListProduct () {
 	}
 //Lựa chọn cách sắp xếp
 	int sortOption;
+	char inputStr[10];
 	printf("\n--- F06: SAP XEP DANH SACH ---\n");
     printf("Chon tieu chi sap xep:\n");
     printf("1. Theo Ten (A-Z)\n");
     printf("2. Theo So luong (Tang dan)\n");
     printf("3. Khong sap xep\n");
     printf("Lua chon: ");
-    while (scanf("%d", &sortOption) != 1 || sortOption < 1 || sortOption > 3) {
-        printf("Lua chon khong hop le. Nhap lai: ");
-        getchar();
-    }
-//Dùng qsort gắn hàm sắp xếp + trả về kết quả 
+    do {
+        printf("Lua chon (1 hoac 2 hoac 3): ");
+        if (fgets(inputStr, sizeof(inputStr), stdin) == NULL) {
+            return;
+        }
+        inputStr[strcspn(inputStr, "\n")] = '\0';
+        if (strlen(inputStr) == 1 && (inputStr[0] == '1' || inputStr[0] == '2' || inputStr[0] == '3')) {
+            sortOption = inputStr[0] - '0'; 
+            break; 
+        } else {
+            printf("ERROR: Lua chon khong hop le. Vui long chi nhap so 1 hoac 2 (khong space, khong de trong).\n");
+        }
+    } while (1);
+
     if (sortOption == 1) {
         qsort(products, productCount, sizeof(Product), compareByName);
         printf("\n**Danh sach da duoc sap xep theo Ten (A-Z)**\n");
@@ -402,6 +474,54 @@ void sortListProduct () {
     }
 	
 }
+// Hàm kiểm tra năm nhuận
+bool isLeap(int year) {
+    return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+}
+// Hàm kiểm tra tính hợp lệ của chuỗi ngày theo định dạng YYYY-MM-DD
+bool isValidDate(const char *date) {
+    //Kiểm tra độ dài và định dạng
+    if (strlen(date)!=10 || date[4]!='-' || date[7]!='-') {
+        return false;
+    }
+    //Kiểm tra ký tự (chỉ số và dấu gạch ngang)
+	int i;
+    for (i=0; i<10; i++) {
+        if (i==4 || i==7) {
+            if (date[i]!='-') return false;
+        } else {
+            if (date[i]<'0' || date[i]>'9') return false;
+        }
+    }
+
+    // Tách các thành phần
+    char year_str[5], month_str[3], day_str[3];
+    strncpy(year_str, date, 4);
+    year_str[4] = '\0';
+    strncpy(month_str, date + 5, 2);
+    month_str[2] = '\0';
+    strncpy(day_str, date + 8, 2);
+    day_str[2] = '\0';
+
+    int year = atoi(year_str);
+    int month = atoi(month_str);
+    int day = atoi(day_str);
+
+    //Kiểm tra logic ngày tháng
+    if (year < 1900 || year > 2100) return false; // Giới hạn năm hợp lý
+    if (month < 1 || month > 12) return false;
+    if (day < 1) return false;
+    // Số ngày tối đa trong tháng
+    int daysInMonth[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    // Xử lý năm nhuận cho tháng 2
+    if (month == 2 && isLeap(year)) {
+        if (day > 29) return false;
+    } else {
+        if (day > daysInMonth[month]) return false;
+    }
+
+    return true;
+}
 //F07_Giao dịch xuất nhập hàng hóa
 void executeTransaction () {
 //Kiểm tra phần tử danh sách
@@ -409,15 +529,13 @@ void executeTransaction () {
 		printf("DANH SACH RONG!!!\n");
 		return;
 	}
-	char id[10], type[4], date[20];
+	char id[10], type[5], date[20];
     int amount, index;
 //Nhập id cần tìm    
     printf("\n--- GIAO DICH XUAT/NHAP HANG HOA ---\n");
     printf("Nhap ID hang hoa: ");
-	getchar();
     fgets(id, sizeof(id), stdin);
 	id[strcspn(id, "\n")] = '\0';
-	fflush(stdin);
 //Tìm kiếm theo id
     index = findProductIndex(id);
     if (index == -1) {
@@ -429,29 +547,35 @@ void executeTransaction () {
         printf("ERROR: Ma hang %s da bi khoa. Khong the thuc hien giao dich.\n", id);
         return;
     }
+	printf("\n--- THONG TIN HANG HOA '%s' TRUOC GIAO DICH ---\n", id);
+	printHeaderList();
+	printProduct(&products[index]);
+	printf("----------------------------------------------------\n");
 //Nhập loại giao dịch
     do {
-        printf("Nhap loai giao dich ('IN' - Nhap, 'OUT' - Xuat): ");
+        printf("Nhap loai giao dich ('I' - Nhap, 'O' - Xuat): ");
         fgets(type, sizeof(type), stdin);
 		type[strcspn(type , "\n")] = '\0';
-		fflush(stdin);
-
-        if (strcmp(type, "IN") != 0 && strcmp(type, "OUT") != 0) {
+        if (strcmp(type, "I") != 0 && strcmp(type, "O") != 0) {
             printf("ERROR: Loai giao dich khong hop le. Nhap lai: \n");
         }
-    } while (strcmp(type, "IN") != 0 && strcmp(type, "OUT") != 0);
+    } while (strcmp(type, "I") != 0 && strcmp(type, "O") != 0);
 //Nhập số lượng + ngày giao dịch
-	printf("Nhap so luong giao dich: ");
-	while (scanf("%d", &amount)!=1 || amount<0) {
-		printf("ERROR: So luong giao dich phai la so nguyen > 0. Nhap lai: \n");
-		getchar();
-	}
-	
-	printf("Ngay giao dich (VD: YYYY-MM-DD): ");
-	scanf("%s", &date);
-	getchar();
-//Kiểm tra logic IN - OUT
-	if (strcmp(type, "IN") == 0) {
+	amount = getNumber("Nhap so luong hang can giao dich: ",1,9999);
+	do {
+        printf("Ngay giao dich (VD: YYYY-MM-DD): ");
+        if (fgets(date, sizeof(date), stdin) == NULL) {
+            // Xử lý lỗi đọc input
+            return;
+        }
+        date[strcspn(date, "\n")] = '\0';
+        // Bổ sung kiểm tra hợp lệ
+        if (!isValidDate(date)) {
+            printf("ERROR: Ngay giao dich khong hop le hoac sai dinh dang (phai la YYYY-MM-DD, khong space).\n");
+        }
+    } while (!isValidDate(date));
+//Kiểm tra logic Nhap - Xuat
+	if (strcmp(type, "I") == 0) {
         products[index].qty += amount;
         printf("\n--- SUCCESS: Nhap %d %s cho %s. Ton kho moi: %d. ---\n", 
                amount, products[index].unit, id, products[index].qty);
@@ -488,19 +612,15 @@ void historyOfTransaction () {
 	}
 	char id[10];
 	int found = 0;
-
 	printf("--- LICH SU XUAT/NHAP HANG HOA ---\n");
 	printf("Nhap vao id can tim: ");
-	getchar();
 //Nhập id cần tìm
 	fgets(id, sizeof(id), stdin);
 	id[strcspn(id, "\n")] = '\0';
-	fflush(stdin); 
 //In lịch sử giao dịch
 	printf("\n--- LICH SU GIAO DICH CUA MA HANG %s ---\n", id);
 	printf("%-10s | %-10s | %-5s | %-8s | %s\n", "ID trans", "ID product", "Type", "So Luong", "Ngay");
 	printf("-------------------------------------------------\n");
-
 	int i;
 	for (i=0; i<transactionCount; i++) {
 		if (strcmp(transactions[i].productId, id)==0) {
@@ -520,27 +640,18 @@ void historyOfTransaction () {
 //Hàm chính
 int main () {
 	//Lựa chọn MENU chính
+	char suggest[] = "Moi ban nhap vao 1 lua chon: ";
 	int choice;
 	do {
 		displayMenuMain ();
-		printf("Nhap vao lua chon cua ban: ");
-		while (scanf("%d", &choice) != 1) {
-        	printf("ERROR: Lua chon phai la so nguyen!!. Nhap lai: ");
-        	getchar();
-    	}
-		
+		choice = getNumber(suggest, 1, 3);
 		switch (choice) {
 			case 1:
 			//Lựa chọn quản lý danh sách
 				int choice1;
 				do {
 					displayListProducts ();
-					printf("Nhap vao lua chon cua ban: ");
-					while (scanf("%d", &choice1) != 1) {
-        			printf("ERROR: Lua chon phai la so nguyen!!. Nhap lai: ");
-        			getchar();
-    				}
-		
+					choice1 = getNumber(suggest, 1, 7);
 					switch (choice1) {
 						case 1:
 							enterProductId ();
@@ -583,12 +694,7 @@ int main () {
 				int choice2;
 				do {
 					displayListTransactions ();
-					printf("Nhap vao lua chon cua ban: ");
-					while (scanf("%d", &choice2) != 1) {
-        			printf("ERROR: Lua chon phai la so nguyen!!. Nhap lai: ");
-        			getchar();
-    				}
-					
+					choice2 = getNumber(suggest, 1, 3);
 					switch (choice2) {
 						case 1:
 							executeTransaction ();
