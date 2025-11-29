@@ -2,6 +2,7 @@
 #include<string.h>
 #include<stdlib.h> 
 #include<stdbool.h>
+#include<ctype.h>
 #define MAX_PRODUCTS 100
 #define MAX_TRANSACTIONS 500
 #define NAME_LENGTH 50
@@ -151,6 +152,16 @@ bool containsSpace(const char *str) {
     return false;
 }
 
+bool containsOnlyLetters(const char *str) {
+    
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (!isalpha(str[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void enterProductId () {
 
 	if (productCount>=MAX_PRODUCTS) {
@@ -183,7 +194,7 @@ void enterProductId () {
 			if (strlen(name) == 0) {
              	printf("ERROR: Ten hang hoa khong duoc rong. Nhap lai!!\n");
         	}
-		} while (strlen(name) == 0);
+		} while ((strlen(name) == 0));
 
 		do {
 			printf("Nhap Don Vi Hang Hoa: ");
@@ -193,8 +204,10 @@ void enterProductId () {
              	printf("ERROR: Don vi hang hoa khong duoc rong. Nhap lai!!\n");
         	} else if (containsSpace(unit)) {
 				printf("ERROR: Don vi hang hoa khong duoc rong. Nhap lai!!\n");
-			}
-		} while (strlen(unit) == 0 || containsSpace(unit));
+			} else if (!containsOnlyLetters(unit)) {
+            	printf("ERROR: Don vi hang hoa chi duoc chua chu cai. Nhap lai!!\n");
+        	}
+		} while (strlen(unit) == 0 || containsSpace(unit) || !containsOnlyLetters(unit));
 
 		qty = getNumber("Nhap So Luong: ", 1, 9999);
 
@@ -244,9 +257,11 @@ void updateInformationProduct () {
 		if (strlen(newUnit) > 0) {
 			if (containsSpace(newUnit)) {
 				printf("ERROR: Don vi hang hoa khong duoc rong. Nhap lai!!\n");
+			} else if (!containsOnlyLetters(newUnit)) {
+				printf("ERROR: Don vi hang hoa chi duoc chua chu cai. Nhap lai!!\n");
 			}
 		}
-	} while (strlen(newUnit) > 0 && containsSpace(newUnit));
+	} while (strlen(newUnit) > 0 && (containsSpace(newUnit) || !containsOnlyLetters(newUnit)));
     if (strlen(newUnit) > 0) {
         strcpy(products[index].unit, newUnit);
     }
