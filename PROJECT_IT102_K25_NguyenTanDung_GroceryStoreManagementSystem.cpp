@@ -144,8 +144,9 @@ void printHeaderList() {
 }
 
 bool containsSpace(const char *str) {
+	size_t len = strlen(str);
     for (int i = 0; str[i] != '\0'; i++) {
-        if (str[i] == ' ' || str[i] == '\t') {
+        if (str[0] == ' ' || str[0] == '\t' || str[len-1] == ' ' || str[len-1] == '\t') {
             return true;
         }
     }
@@ -193,8 +194,10 @@ void enterProductId () {
 			name[strcspn(name, "\n")] = '\0';
 			if (strlen(name) == 0) {
              	printf("ERROR: Ten hang hoa khong duoc rong. Nhap lai!!\n");
-        	}
-		} while ((strlen(name) == 0));
+        	} else if (containsSpace(name)) {
+				printf("ERROR: Ten khong duoc chua khoang trang dau va cuoi. Vui long nhap lai.\n");
+			}
+		} while ((strlen(name) == 0) || containsSpace(name));
 
 		do {
 			printf("Nhap Don Vi Hang Hoa: ");
@@ -243,13 +246,18 @@ void updateInformationProduct () {
         return;
     }
 
+	do {
 	printf("Nhap Ten hang hoa moi (Enter de giu nguyen): ");
     fgets(newName, sizeof(newName), stdin);
     newName[strcspn(newName, "\n")] = '\0';
-    if (strlen(newName) > 0) {
+	bool hasSpace = containsSpace(newName);
+    if (hasSpace) {
+				printf("ERROR: Ten khong duoc chua khoang trang dau va cuoi. Vui long nhap lai.\n");
+			}
+	} while (strlen(newName) > 0 && (containsSpace(newName)));
+	if (strlen(newName) > 0) {
         strcpy(products[index].name, newName);
     }
-
     do {
 		printf("Nhap Don vi moi (Enter de giu nguyen): ");
    	 	fgets(newUnit, sizeof(newUnit), stdin);
